@@ -1,6 +1,33 @@
-import { Link, Links, Outlet } from "react-router-dom";
+import { Link, Links, Navigate, Outlet, useNavigate } from "react-router-dom";
+import { logout, useDecodeToken } from "../_services/auth";
+import { useEffect } from "react";
 
 export default function AdminLayout() {
+  const navigate = useNavigate()
+  
+  const token = localStorage.getItem("accessToken");
+  const userInfo = JSON.parse(localStorage.getItem("accessToken"));
+  const decodedData = useDecodeToken(token);
+  
+
+  useEffect(() => {
+    if (!token || !decodedData || !decodedData.success) {
+      navigate("/login")
+    }
+
+    const role = userInfo.data.role
+    if (role !== "admin" || !role) {
+      navigate("/")
+    }
+  }, [token, decodedData, navigate])
+
+  const handleLogout =async () => {
+    if (token) {
+      await logout({ token });
+      localStorage.removeItem("userInfo");
+      navigate("/login");
+    }
+  }
   return (
     <>
       <div className="antialiased bg-gray-50 dark:bg-gray-900">
@@ -76,6 +103,8 @@ export default function AdminLayout() {
                 </svg>
               </button>
 
+              <Link to={"/"} className="bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none dark:focus:ring-gray-800">{userInfo.name}</Link>
+
               <button
                 type="button"
                 className="flex mx-3 text-sm bg-gray-800 rounded-full md:mr-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
@@ -84,6 +113,7 @@ export default function AdminLayout() {
                 data-dropdown-toggle="dropdown"
               >
                 <span className="sr-only">Open user menu</span>
+                
                 <img
                   className="w-8 h-8 rounded-full"
                   src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/michael-gough.png"
@@ -246,7 +276,6 @@ export default function AdminLayout() {
                   </Link>
               </li>
               <li>
-
                 <Link to={"#"} className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group">
                   <svg
                     aria-hidden="true"
@@ -264,6 +293,15 @@ export default function AdminLayout() {
                   <span className="ml-3">Help</span>
                 </Link>
               </li>
+
+              <li>
+                
+                <Link onClick={handleLogout} className="flex items-center p-2 text-base font-medium text-gray -900 rounded-lg transition duration-75 bg-red-100 hover:bg-red-200 dark:hover:bg-gray-700 dark:text-white group">
+                  
+                  <span className="ml-3">Logout</span>
+                </Link>
+              </li>
+
             </ul>
           </div>
         </aside>

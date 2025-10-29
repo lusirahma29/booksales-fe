@@ -1,107 +1,197 @@
-export default function Register() {
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
+
+const Register = () => {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    agree: false,
+  });
+
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setForm({
+      ...form,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!form.agree) {
+      alert("Please accept the terms and conditions.");
+      return;
+    }
+
+    if (form.password !== form.confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    try {
+      await axios.post("http://localhost:8000/api/register", {
+        name: form.name,
+        email: form.email,
+        password: form.password,
+      });
+      alert("Registration successful!");
+      navigate("/login");
+    } catch (error) {
+      alert("Registration failed.");
+      console.error(error);
+    }
+  };
+
   return (
-    <>
-      <section className="bg-gray-50 dark:bg-gray-900">
-        <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-          <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-            <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-              <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                Create an account
-              </h1>
-              <form className="space-y-4 md:space-y-6" action="#">
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Your email
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    id="email"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-600 focus:border-indigo-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="name@company.com"
-                    required=""
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Your name
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    id="name"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-600 focus:border-indigo-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="name@company.com"
-                    required=""
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="password"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    name="password"
-                    id="password"
-                    placeholder="••••••••"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-600 focus:border-indigo-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    required=""
-                  />
-                </div>
-                <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="terms"
-                      aria-describedby="terms"
-                      type="checkbox"
-                      className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-indigo-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-indigo-600 dark:ring-offset-gray-800"
-                      required=""
-                    />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label
-                      htmlFor="terms"
-                      className="font-light text-gray-500 dark:text-gray-300"
-                    >
-                      I accept the{" "}
-                      <a
-                        className="font-medium text-indigo-600 hover:underline dark:text-indigo-500"
-                        href="#"
-                      >
-                        Terms and Conditions
-                      </a>
-                    </label>
-                  </div>
-                </div>
-                <button
-                  type="submit"
-                  className="w-full text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
-                >
-                  Create an account
-                </button>
-                <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                  Already have an account?{" "}
-                  <a
-                    href="login"
-                    className="font-medium text-indigo-600 hover:underline dark:text-indigo-500"
-                  >
-                    Login here
-                  </a>
-                </p>
-              </form>
-            </div>
-          </div>
-        </div>
-      </section>
-    </>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "100vh",
+        backgroundColor: "#f2f4f7",
+      }}
+    >
+      <form
+        onSubmit={handleSubmit}
+        style={{
+          backgroundColor: "white",
+          padding: "2rem",
+          borderRadius: "1rem",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+          width: "100%",
+          maxWidth: "400px",
+        }}
+      >
+        <h2
+          style={{
+            textAlign: "center",
+            marginBottom: "1.5rem",
+            color: "#333",
+          }}
+        >
+          Create an Account
+        </h2>
+
+        <label>Your Name</label>
+        <input
+          type="text"
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          required
+          style={{
+            width: "100%",
+            padding: "0.75rem",
+            marginBottom: "1rem",
+            borderRadius: "0.5rem",
+            border: "1px solid #ccc",
+          }}
+        />
+
+        <label>Your Email</label>
+        <input
+          type="email"
+          name="email"
+          value={form.email}
+          onChange={handleChange}
+          required
+          style={{
+            width: "100%",
+            padding: "0.75rem",
+            marginBottom: "1rem",
+            borderRadius: "0.5rem",
+            border: "1px solid #ccc",
+          }}
+        />
+
+        <label>Password</label>
+        <input
+          type="password"
+          name="password"
+          value={form.password}
+          onChange={handleChange}
+          required
+          style={{
+            width: "100%",
+            padding: "0.75rem",
+            marginBottom: "1rem",
+            borderRadius: "0.5rem",
+            border: "1px solid #ccc",
+          }}
+        />
+
+        <label>Confirm Password</label>
+        <input
+          type="password"
+          name="confirmPassword"
+          value={form.confirmPassword}
+          onChange={handleChange}
+          required
+          style={{
+            width: "100%",
+            padding: "0.75rem",
+            marginBottom: "1rem",
+            borderRadius: "0.5rem",
+            border: "1px solid #ccc",
+          }}
+        />
+
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            fontSize: "0.9rem",
+          }}
+        >
+          <input
+            type="checkbox"
+            name="agree"
+            checked={form.agree}
+            onChange={handleChange}
+          />
+          I accept the Terms and Conditions
+        </label>
+
+        <button
+          type="submit"
+          style={{
+            width: "100%",
+            padding: "0.75rem",
+            marginTop: "1rem",
+            backgroundColor: "#2563eb",
+            color: "white",
+            fontWeight: "bold",
+            border: "none",
+            borderRadius: "0.5rem",
+            cursor: "pointer",
+          }}
+        >
+          Register
+        </button>
+
+        <p
+          style={{
+            textAlign: "center",
+            marginTop: "1rem",
+            fontSize: "0.9rem",
+          }}
+        >
+          Already have an account?{" "}
+          <Link to="/login" style={{ color: "#2563eb", fontWeight: "bold" }}>
+            Login here
+          </Link>
+        </p>
+      </form>
+    </div>
   );
-}
+};
+
+export default Register;
