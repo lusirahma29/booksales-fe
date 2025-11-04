@@ -17,7 +17,11 @@ export const createAuthor = async (data) => {
 
 export const showAuthor = async (id) => {
   try {
-    const { data } = await API.get(`/authors/${id}`)
+    const { data } = await API.get(`/authors/${id}`, data, { 
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
     return data.data
   } catch (error) {
     console.log(error)

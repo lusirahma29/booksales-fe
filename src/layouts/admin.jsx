@@ -1,33 +1,39 @@
-import { Link, Links, Navigate, Outlet, useNavigate } from "react-router-dom";
-import { logout, useDecodeToken } from "../_services/auth";
+import { Link, Navigate, Outlet, useNavigate } from "react-router-dom";
+import { useDecodeToken } from "../_services/auth";
 import { useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
 
 export default function AdminLayout() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   
   const token = localStorage.getItem("accessToken");
-  const userInfo = JSON.parse(localStorage.getItem("accessToken"));
-  const decodedData = useDecodeToken(token);
+  const user = token ? jwtDecode(token) : null; 
+  const decodedData = useDecodeToken(token);    
   
-
   useEffect(() => {
+    if (decodedData === undefined) return;
+
     if (!token || !decodedData || !decodedData.success) {
-      navigate("/login")
-    }
-
-    const role = userInfo.data.role
-    if (role !== "admin" || !role) {
-      navigate("/")
-    }
-  }, [token, decodedData, navigate])
-
-  const handleLogout =async () => {
-    if (token) {
-      await logout({ token });
-      localStorage.removeItem("userInfo");
       navigate("/login");
+      return;
     }
-  }
+
+    const storedUser = JSON.parse(localStorage.getItem("userInfo"));
+    const role = user?.role || storedUser?.role;
+
+
+    if (!role || role !== "admin") {
+      navigate("/");
+      return;
+    }
+  }, [token, decodedData, navigate]);
+
+  const handleLogout = () => {
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("userInfo");
+
+  navigate("/login");
+};
   return (
     <>
       <div className="antialiased bg-gray-50 dark:bg-gray-900">
@@ -103,7 +109,7 @@ export default function AdminLayout() {
                 </svg>
               </button>
 
-              <Link to={"/"} className="bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none dark:focus:ring-gray-800">{userInfo.name}</Link>
+              <Link to={"/"} className="bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none dark:focus:ring-gray-800">{user.name}</Link>
 
               <button
                 type="button"
@@ -296,10 +302,22 @@ export default function AdminLayout() {
 
               <li>
                 
-                <Link onClick={handleLogout} className="flex items-center p-2 text-base font-medium text-gray -900 rounded-lg transition duration-75 bg-red-100 hover:bg-red-200 dark:hover:bg-gray-700 dark:text-white group">
-                  
-                  <span className="ml-3">Logout</span>
-                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center p-2 text-base font-medium text-red-600 rounded-lg transition duration-75 bg-red-100 hover:bg-red-200 dark:hover:bg-gray-700 dark:text-white group"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-5 h-5 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
+                  </svg>
+                  Logout
+                </button>
+
               </li>
 
             </ul>

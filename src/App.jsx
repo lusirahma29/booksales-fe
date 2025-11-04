@@ -28,7 +28,6 @@ function App() {
             <Route index element={<Books />} />
             <Route path="show/:id" element={<ShowBook />} />
           </Route>
-          
         </Route>
 
         {/* Auth */}

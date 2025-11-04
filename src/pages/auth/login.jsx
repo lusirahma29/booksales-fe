@@ -31,11 +31,13 @@ export default function Login() {
 
     try {
       const response = await login(formData)
+      console.log("User info:", response.user);
 
 
-       localStorage.setItem("accessToken", response.token)
+        localStorage.setItem("accessToken", response.token)
         localStorage.setItem("userInfo", JSON.stringify(response.user))
       return navigate(response.user.role === "admin" ? "/admin" : "/")
+      
 
     } catch (error) {
       setError(error?.response?.data?.message)
@@ -45,11 +47,16 @@ export default function Login() {
   }
 
   useEffect(() => {
-   if (token && decodedData.success) {
-     navigate("/admin")
-   }
+  if (token && decodedData.success) {
+    const user = JSON.parse(localStorage.getItem("userInfo"));
+    if (user?.role === "admin") {
+      navigate("/admin");
+    } else {
+      navigate("/");
+    }
+  }
+}, [token, decodedData, navigate]);
 
- }, [token, decodedData, navigate])
 
   return (
     <>

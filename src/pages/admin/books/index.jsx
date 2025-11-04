@@ -185,7 +185,7 @@ export default function AdminBooks() {
                             >
                               <li>
                                 <Link
-                                  to={`/admin/books/edit${book.id}`}
+                                  to={`/admin/books/edit/${book.id}`}
                                   className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                                 >
                                   Edit

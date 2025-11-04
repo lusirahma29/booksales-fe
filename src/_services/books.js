@@ -8,7 +8,11 @@ return data.data
 
 export const createBook = async (data) => {
   try {
-    const response = await API.post("/books", data)
+    const response = await API.post("/books", data, { 
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    }) 
     return response.data
   } catch (error) {
     console.log(error);
